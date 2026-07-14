@@ -1,8 +1,8 @@
-const CACHE_NAME = 'protein-widget-v90';
+const CACHE_NAME = 'odanwan-v91';
 const ASSETS = [
     'index.html',
-    'style.css?v=90',
-    'app.js?v=90',
+    'style.css?v=91',
+    'app.js?v=91',
     'manifest.json',
     'icon.png',
     'icon_splash.png'
