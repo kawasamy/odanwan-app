@@ -1,0 +1,24 @@
+{
+  "name": "오단완 - 오늘 단백질 완료!",
+  "short_name": "오단완",
+  "description": "오늘 단백질 완료! 간편하고 세련된 헬스 헬퍼",
+  "start_url": "index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d0e12",
+  "theme_color": "#0d0e12",
+  "icons": [
+    {
+      "src": "icon_splash.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>오단완</title>
+    
+    <!-- iOS PWA settings -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="오단완">
+    <link rel="apple-touch-icon" href="icon.png">
+    
+    <!-- Manifest & Theme -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0d0e12">
+    
+    <!-- Google Fonts for premium typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css?v=90">
+</head>
+<body class="fullscreen-layout">
+    <div class="widget-container theme-yellow">
+        <!-- Tab Header -->
+        <div class="tab-header">
+            <button class="tab-btn active" id="btn-tab-protein" onclick="switchTab('protein')">🥛 단백질</button>
+            <button class="tab-btn" id="btn-tab-workout" onclick="switchTab('workout')">🏋️ 세트</button>
+        </div>
+
+        <div class="tab-views-wrapper">
+            <!-- Protein Tab View -->
+            <div id="view-protein" class="tab-view active">
+                <header class="widget-header">
+                    <h1>단백질 계산기</h1>
+                    <div class="weight-settings">
+                        <input type="number" id="weight-input" placeholder="몸무게" value="70" inputmode="numeric">
+                        <span class="weight-unit">kg</span>
+                    </div>
+                </header>
+
+                <!-- Progress Area (Click to open history) -->
+                <div class="progress-section" onclick="openProteinHistory()" style="cursor: pointer;">
+                    <svg class="progress-ring" width="184" height="184">
+                        <defs>
+                            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feGaussianBlur stdDeviation="8" result="blur" />
+                                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                            </filter>
+                        </defs>
+                        <circle class="progress-ring-bg" cx="92" cy="92" r="78" />
+                        <circle class="progress-ring-bar" cx="92" cy="92" r="78" />
+                    </svg>
+                    <div class="counter-display">
+                        <span id="protein-total" class="total-number">0</span>
+                        <span class="unit">g</span>
+                        <span id="status-message" class="status-message">대기 중</span>
+                    </div>
+                </div>
+
+                <!-- Target Info Section -->
+                <div class="target-info-container">
+                    <div class="info-row">
+                        <span class="info-label" id="target-label">🎯 권장 (1.4x)</span>
+                        <span id="target-remaining" class="info-value">권장까지 -0g</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label" id="max-label">⚡ 최적 (1.6x)</span>
+                        <span id="max-remaining" class="info-value">최적까지 -0g</span>
+                    </div>
+                </div>
+
+                <!-- Quick Add Section -->
+                <div class="quick-add-grid">
+                    <button class="btn-quick btn-neg" onclick="adjustCustomInput(-10)">-10g</button>
+                    <button class="btn-quick btn-neg" onclick="adjustCustomInput(-5)">-5g</button>
+                    <button class="btn-quick btn-neg" onclick="adjustCustomInput(-1)">-1g</button>
+                    <button class="btn-quick" onclick="adjustCustomInput(1)">+1g</button>
+                    <button class="btn-quick" onclick="adjustCustomInput(5)">+5g</button>
+                    <button class="btn-quick" onclick="adjustCustomInput(10)">+10g</button>
+                </div>
+
+                <!-- Custom Add Input & Action Section -->
+                <div class="input-section">
+                    <div class="input-wrapper" style="position: relative; flex: 1; display: flex; align-items: center;">
+                        <input type="number" id="custom-amount" placeholder="직접 입력 (g)" inputmode="numeric" min="1" max="500" style="padding-right: 40px; width: 100%;">
+                        <button id="btn-clear-input" class="btn-clear-input" onclick="clearCustomInput()" style="position: absolute; right: 12px; background: transparent; border: none; color: var(--text-muted); cursor: pointer; display: none; align-items: center; justify-content: center; padding: 4px; z-index: 2;">
+                            <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <button class="btn-primary" onclick="addCustomProtein()">추가</button>
+                </div>
+
+                <!-- Reset & Undo Footer -->
+                <footer class="widget-footer">
+                    <button class="btn-undo" id="btn-undo" onclick="undoProtein()" disabled>
+                        <svg class="icon-undo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 7v6h6"></path>
+                            <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path>
+                        </svg>
+                        <span>되돌리기</span>
+                    </button>
+                    <button class="btn-reset" id="btn-reset" onclick="confirmReset()">
+                        <svg class="icon-reset" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                            <path d="M3 3v5h5"></path>
+                        </svg>
+                        <span>초기화</span>
+                    </button>
+                </footer>
+            </div>
+
+            <!-- Workout Tab View -->
+            <div id="view-workout" class="tab-view">
+                <header class="widget-header">
+                    <h1>세트 카운터</h1>
+                    <div class="stopwatch-container" onclick="handleStopwatchClick()">
+                        <span id="stopwatch-display" class="stopwatch-time">운동 시작</span>
+                    </div>
+                </header>
+
+                <!-- Workout Sets Display -->
+                <div class="progress-section" onclick="openWorkoutHistory()" style="cursor: pointer;">
+                    <div class="sets-circle">
+                        <div class="sets-counter-display">
+                            <span id="sets-total" class="sets-number">0</span>
+                            <span class="sets-unit">SETS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Rest Timer Display (Moved below circle) -->
+                <div id="rest-timer-container" class="rest-timer-container">
+                    <div id="rest-timer" class="rest-timer-display">
+                        <span id="rest-timer-text" onclick="handleTimerClick()">02:00</span>
+                    </div>
+                    <button id="btn-timer-plus30" class="btn-timer-plus" onclick="add30Seconds(event)">+30s</button>
+                </div>
+
+                <!-- Last Rest Duration Display -->
+                <div id="last-rest-container" class="last-rest-container" style="display: none;">
+                    <span class="last-rest-label">이전 휴식</span>
+                    <span id="last-rest-time" class="last-rest-value">-</span>
+                </div>
+
+                <!-- Timer Duration Presets -->
+                <div class="timer-presets">
+                    <button class="btn-preset-time" onclick="setTimerDuration(90)">1:30</button>
+                    <button class="btn-preset-time active" onclick="setTimerDuration(120)">2:00</button>
+                    <button class="btn-preset-time" onclick="setTimerDuration(150)">2:30</button>
+                    <button class="btn-preset-time" onclick="setTimerDuration(180)">3:00</button>
+                </div>
+
+                <!-- Sets Controls Section -->
+                <div class="quick-add-grid sets-controls">
+                    <button class="btn-quick btn-neg" onclick="adjustSets(-1)">-1 세트</button>
+                    <button class="btn-quick btn-sets-add" onclick="adjustSets(1)">+1 세트</button>
+                </div>
+
+                <!-- Reset Footer -->
+                <footer class="widget-footer">
+                    <button class="btn-reset" id="btn-reset-sets" onclick="confirmResetSets()">
+                        <svg class="icon-reset" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                            <path d="M3 3v5h5"></path>
+                        </svg>
+                        <span>초기화</span>
+                    </button>
+                </footer>
+            </div>
+        </div>
+
+        <!-- AdMob Bottom Banner Ad Container -->
+        <div id="ad-banner-container" class="ad-banner-container">
+            <div class="ad-placeholder-temp">
+                <span class="ad-placeholder-text">AdMob Banner Ad Slot</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backdrop Overlay for Bottom Sheet -->
+    <div id="backdrop-overlay" class="backdrop-overlay" onclick="closeBottomSheet()"></div>
+
+    <!-- iOS style Bottom Sheet -->
+    <div id="bottom-sheet" class="bottom-sheet">
+        <div class="sheet-header">
+            <div class="sheet-handle"></div>
+            <h2 id="sheet-title">단백질 섭취 기록</h2>
+        </div>
+        <div id="sheet-content" class="sheet-content">
+            <!-- Dynamic content injected here -->
+        </div>
+        <button class="btn-sheet-close" onclick="closeBottomSheet()">닫기</button>
+    </div>
+    
+    <!-- Custom Update Notification Dialog -->
+    <div id="update-dialog-backdrop" class="update-dialog-backdrop">
+        <div class="update-dialog">
+            <h2 class="update-dialog-title">업데이트 안내</h2>
+            <p class="update-dialog-message">새 버전이 준비되었습니다.<br>지금 업데이트하면 최신 기능을 사용할 수 있습니다.</p>
+            <div class="update-dialog-buttons">
+                <button id="btn-update-later" class="btn-dialog btn-dialog-secondary">나중에</button>
+                <button id="btn-update-now" class="btn-dialog btn-dialog-primary">업데이트</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js?v=90"></script>
+    <script>
+        // Register Service Worker for offline capability
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => {
+                        console.log('Service Worker Registered');
+                        
+                        // 이미 대기 중인 업데이트가 있는 경우
+                        if (reg.waiting) {
+                            checkAndUpdate(reg);
+                        }
+                        
+                        // 새로운 업데이트를 발견하는 리스너
+                        reg.addEventListener('updatefound', () => {
+                            const newWorker = reg.installing;
+                            if (newWorker) {
+                                newWorker.addEventListener('statechange', () => {
+                                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                        checkAndUpdate(reg);
+                                    }
+                                });
+                            }
+                        });
+                    })
+                    .catch(err => console.log('Service Worker Registration Failed', err));
+            });
+
+            // 컨트롤러 변경 시 단 한번만 새로고침 실행
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    refreshing = true;
+                    window.location.reload();
+                }
+            });
+        }
+
+        function checkAndUpdate(reg) {
+            // 동일 세션(앱 재실행 전까지) 내에 취소한 적이 있다면 팝업 생략 (필수 조건문)
+            if (sessionStorage.getItem('pwa_update_dismissed') === 'true') {
+                return;
+            }
+
+            const backdrop = document.getElementById('update-dialog-backdrop');
+            const btnLater = document.getElementById('btn-update-later');
+            const btnNow = document.getElementById('btn-update-now');
+
+            if (backdrop && btnLater && btnNow) {
+                // 중복 노출 방지 및 버튼 활성화 상태 초기화
+                btnNow.disabled = false;
+                btnNow.style.opacity = '1';
+                btnNow.style.pointerEvents = 'auto';
+                
+                backdrop.classList.add('show');
+
+                btnLater.onclick = () => {
+                    backdrop.classList.remove('show');
+                    sessionStorage.setItem('pwa_update_dismissed', 'true');
+                };
+
+                btnNow.onclick = () => {
+                    // 중복 클릭 방지: 즉시 버튼 비활성화 및 투명도 조절
+                    btnNow.disabled = true;
+                    btnNow.style.opacity = '0.6';
+                    btnNow.style.pointerEvents = 'none';
+                    
+                    if (reg.waiting) {
+                        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                    }
+                };
+            }
+        }
+    </script>
+</body>
+</html>
