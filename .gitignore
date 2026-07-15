@@ -1,1 +1,16 @@
+# Node
 node_modules/
+
+# Android Build
+android/.gradle/
+android/build/
+android/.idea/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Backup
+*.bak
