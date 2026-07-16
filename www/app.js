@@ -1305,6 +1305,12 @@ const AdMobManager = {
             });
             console.log('AdMob: SDK 초기화 완료');
 
+            // 모바일 앱 환경일 때 HTML 임시 점선 상자를 완전히 제거 (가로선 유출 차단)
+            const tempPlaceholder = document.getElementById('ad-banner-container');
+            if (tempPlaceholder) {
+                tempPlaceholder.style.display = 'none';
+            }
+
             await this.showBanner(AdMob);
         } catch (error) {
             console.error('AdMob 구동 오류:', error);
@@ -1325,7 +1331,7 @@ const AdMobManager = {
             });
             console.log('AdMob: 배너 광고 로딩 완료');
 
-            document.body.style.paddingBottom = '60px';
+            document.body.style.paddingBottom = '50px';
         } catch (error) {
             console.error('AdMob 배너 출력 실패:', error);
         }
