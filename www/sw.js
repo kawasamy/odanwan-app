@@ -1,8 +1,8 @@
-const CACHE_NAME = 'odanwan-v93';
+const CACHE_NAME = 'odanwan-v94';
 const ASSETS = [
     'index.html',
-    'style.css?v=93',
-    'app.js?v=93',
+    'style.css?v=94',
+    'app.js?v=94',
     'manifest.json',
     'icon.png',
     'icon_splash.png'

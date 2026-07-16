@@ -1273,8 +1273,7 @@ weightInput.addEventListener('input', function() {
     updateUI(false);
 });
 
-// Run Initialization
-init();
+// Run Initialization (Moved to the end of the file after AdMobManager is defined)
 
 // Handle visibility change to re-acquire Wake Lock if app returns to foreground
 document.addEventListener('visibilitychange', async () => {
@@ -1329,5 +1328,8 @@ const AdMobManager = {
         }
     }
 };
+
+// Run Initialization
+init();
 
 
