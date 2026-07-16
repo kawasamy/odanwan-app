@@ -162,6 +162,9 @@ function init() {
     updateSetsUI(false);
     updateDurationSelectorUI();
     toggleClearButton(); // Sync initial state of X button
+    
+    // AdMob 초기화 및 가동 실행
+    AdMobManager.init();
 }
 
 // Switch between tabs (Protein / Workout Sets)
@@ -603,7 +606,10 @@ function adjustSets(amount) {
         if (workoutHistory.length > 0) {
             const lastSetTime = workoutHistory[workoutHistory.length - 1].timestamp;
             const restMs = Date.now() - lastSetTime;
-            restFormatted = formatRestDuration(restMs);
+            const targetDurationSecs = restTimerStartDuration || defaultRestDuration || 120;
+            const restSecs = Math.floor(restMs / 1000);
+            const finalRestSecs = Math.min(restSecs, targetDurationSecs);
+            restFormatted = formatRestDuration(finalRestSecs * 1000);
         }
         
         workoutHistory.push({
@@ -1276,5 +1282,52 @@ document.addEventListener('visibilitychange', async () => {
         updateWakeLockState();
     }
 });
+
+// AdMob 광고 제어 모듈
+const AdMobManager = {
+    TEST_BANNER_ID_ANDROID: 'ca-app-pub-3940256099942544/6300978111',
+    TEST_BANNER_ID_IOS: 'ca-app-pub-3940256099942544/2934735716',
+
+    async init() {
+        const isCapacitor = !!window.Capacitor;
+        const AdMob = isCapacitor && window.Capacitor.Plugins.AdMob;
+
+        if (!AdMob) {
+            console.log('AdMob: PC 브라우저 환경이므로 SDK를 기동하지 않습니다.');
+            return;
+        }
+
+        try {
+            await AdMob.initialize({
+                initializeForTesting: true
+            });
+            console.log('AdMob: SDK 초기화 완료');
+
+            await this.showBanner(AdMob);
+        } catch (error) {
+            console.error('AdMob 구동 오류:', error);
+        }
+    },
+
+    async showBanner(AdMob) {
+        const isAndroid = window.Capacitor.getPlatform() === 'android';
+        const adId = isAndroid ? this.TEST_BANNER_ID_ANDROID : this.TEST_BANNER_ID_IOS;
+
+        try {
+            await AdMob.showBanner({
+                adId: adId,
+                adSize: 'ADAPTIVE_BANNER',
+                position: 'BOTTOM_CENTER',
+                margin: 0,
+                isTesting: true
+            });
+            console.log('AdMob: 배너 광고 로딩 완료');
+
+            document.body.style.paddingBottom = '60px';
+        } catch (error) {
+            console.error('AdMob 배너 출력 실패:', error);
+        }
+    }
+};
 
 
