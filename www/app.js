@@ -1286,6 +1286,9 @@ document.addEventListener('visibilitychange', async () => {
 const AdMobManager = {
     TEST_BANNER_ID_ANDROID: 'ca-app-pub-3940256099942544/6300978111',
     TEST_BANNER_ID_IOS: 'ca-app-pub-3940256099942544/2934735716',
+    
+    // 회원님의 실제 광고 단위 ID (나중에 배포 시 TEST_BANNER_ID_ANDROID 대신 사용)
+    // REAL_BANNER_ID_ANDROID: 'ca-app-pub-3564568171908565/9341449762',
 
     async init() {
         const isCapacitor = !!window.Capacitor;
