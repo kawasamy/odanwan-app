@@ -21,7 +21,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <!-- Stylesheet -->
-    <link rel="stylesheet" href="style.css?v=100">
+    <link rel="stylesheet" href="style.css?v=110">
 </head>
 <body class="fullscreen-layout">
     <div class="widget-container theme-yellow">
@@ -199,92 +199,15 @@
         <button class="btn-sheet-close" onclick="closeBottomSheet()">닫기</button>
     </div>
     
-    <!-- Custom Update Notification Dialog -->
-    <div id="update-dialog-backdrop" class="update-dialog-backdrop">
-        <div class="update-dialog">
-            <h2 class="update-dialog-title">업데이트 안내</h2>
-            <p class="update-dialog-message">새 버전이 준비되었습니다.<br>지금 업데이트하면 최신 기능을 사용할 수 있습니다.</p>
-            <div class="update-dialog-buttons">
-                <button id="btn-update-later" class="btn-dialog btn-dialog-secondary">나중에</button>
-                <button id="btn-update-now" class="btn-dialog btn-dialog-primary">업데이트</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Scripts -->
-    <script src="app.js?v=100"></script>
+    <script src="app.js?v=110"></script>
     <script>
         // Register Service Worker for offline capability
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
-                    .then(reg => {
-                        console.log('Service Worker Registered');
-                        
-                        // 이미 대기 중인 업데이트가 있는 경우
-                        if (reg.waiting) {
-                            checkAndUpdate(reg);
-                        }
-                        
-                        // 새로운 업데이트를 발견하는 리스너
-                        reg.addEventListener('updatefound', () => {
-                            const newWorker = reg.installing;
-                            if (newWorker) {
-                                newWorker.addEventListener('statechange', () => {
-                                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                        checkAndUpdate(reg);
-                                    }
-                                });
-                            }
-                        });
-                    })
                     .catch(err => console.log('Service Worker Registration Failed', err));
             });
-
-            // 컨트롤러 변경 시 단 한번만 새로고침 실행
-            let refreshing = false;
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                if (!refreshing) {
-                    refreshing = true;
-                    window.location.reload();
-                }
-            });
-        }
-
-        function checkAndUpdate(reg) {
-            // 동일 세션(앱 재실행 전까지) 내에 취소한 적이 있다면 팝업 생략 (필수 조건문)
-            if (sessionStorage.getItem('pwa_update_dismissed') === 'true') {
-                return;
-            }
-
-            const backdrop = document.getElementById('update-dialog-backdrop');
-            const btnLater = document.getElementById('btn-update-later');
-            const btnNow = document.getElementById('btn-update-now');
-
-            if (backdrop && btnLater && btnNow) {
-                // 중복 노출 방지 및 버튼 활성화 상태 초기화
-                btnNow.disabled = false;
-                btnNow.style.opacity = '1';
-                btnNow.style.pointerEvents = 'auto';
-                
-                backdrop.classList.add('show');
-
-                btnLater.onclick = () => {
-                    backdrop.classList.remove('show');
-                    sessionStorage.setItem('pwa_update_dismissed', 'true');
-                };
-
-                btnNow.onclick = () => {
-                    // 중복 클릭 방지: 즉시 버튼 비활성화 및 투명도 조절
-                    btnNow.disabled = true;
-                    btnNow.style.opacity = '0.6';
-                    btnNow.style.pointerEvents = 'none';
-                    
-                    if (reg.waiting) {
-                        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-                    }
-                };
-            }
         }
     </script>
 </body>
