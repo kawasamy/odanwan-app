@@ -430,7 +430,7 @@ body {
 .widget-footer {
     display: flex;
     justify-content: center;
-    margin-top: 16px; /* 다른 요소들과 대칭을 맞추기 위해 16px로 통일 */
+    margin-top: 0; /* 이중 여백 방지를 위해 마진 제거 (부모의 16px gap만 작동) */
     z-index: 1;
     gap: 12px;
 }
