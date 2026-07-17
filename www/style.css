@@ -430,7 +430,7 @@ body {
 .widget-footer {
     display: flex;
     justify-content: center;
-    margin-top: 20px; /* auto 대신 20px 여백으로 상단 버튼들과 밀착 */
+    margin-top: 16px; /* 다른 요소들과 대칭을 맞추기 위해 16px로 통일 */
     z-index: 1;
     gap: 12px;
 }
